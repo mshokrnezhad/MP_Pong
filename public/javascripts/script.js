@@ -89,7 +89,9 @@ function renderCanvas() {
 function ballReset() {
   ballX = width / 2;
   ballY = height / 2;
-  speedY = 3;
+  ballDirection = 1;
+  speedY = 2;
+  speedX = 0;
 
   socket.emit("ballMove", {
     ballX,
