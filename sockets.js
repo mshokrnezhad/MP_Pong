@@ -5,23 +5,27 @@ function listen(io) {
 
   pongNamespace.on("connection", (socket) => {
     console.log("user is connected. ID:", socket.id);
+    let room;
 
     socket.on("ready", () => {
-      console.log("user is ready. ID:", socket.id);
+      room = "room" + Math.floor(readyPlayersCount / 2);
+      socket.join(room);
+      console.log("user is ready. ID:", socket.id, room);
+
       readyPlayersCount += 1;
 
       if (readyPlayersCount % 2 === 0) {
         console.log("number of ready players is", readyPlayersCount);
-        pongNamespace.emit("startGame", socket.id);
+        pongNamespace.in(room).emit("startGame", socket.id);
       }
     });
 
     socket.on("paddleMove", (paddleData) => {
-      socket.broadcast.emit("paddleMove", paddleData);
+      socket.to(room).emit("paddleMove", paddleData);
     });
 
     socket.on("ballMove", (ballData) => {
-      socket.broadcast.emit("ballMove", ballData);
+      socket.to(room).emit("ballMove", ballData);
     });
 
     socket.on("disconnect", (reason) => {
@@ -32,6 +36,7 @@ function listen(io) {
         reason,
         ")"
       );
+      socket.leave(room);
     });
   });
 }
