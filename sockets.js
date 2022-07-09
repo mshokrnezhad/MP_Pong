@@ -1,7 +1,9 @@
-function listen(io) {
-  let readyPlayersCount = 0;
+let readyPlayersCount = 0;
 
-  io.on("connection", (socket) => {
+function listen(io) {
+  const pongNamespace = io.of("/pong");
+
+  pongNamespace.on("connection", (socket) => {
     console.log("user is connected. ID:", socket.id);
 
     socket.on("ready", () => {
@@ -10,7 +12,7 @@ function listen(io) {
 
       if (readyPlayersCount % 2 === 0) {
         console.log("number of ready players is", readyPlayersCount);
-        io.emit("startGame", socket.id);
+        pongNamespace.emit("startGame", socket.id);
       }
     });
 
